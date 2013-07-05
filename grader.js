@@ -65,9 +65,18 @@ var clone = function(fn) {
     return fn.bind({});
 };
 
-var completeDownload = function()
+var completeDownload = function(data)
 {
-	
+	//console.log(data);
+	$ = cheerio.load(data);
+	var checks = loadChecks(program.checks).sort();
+    var out = {};
+    for(var ii in checks) {
+        var present = $(checks[ii]).length > 0;
+        out[checks[ii]] = present;
+    }
+	var outJson = JSON.stringify(out, null, 4);
+    console.log(outJson);
 }
 
 if(require.main == module) {
@@ -77,19 +86,20 @@ if(require.main == module) {
         .option('-u, --url <url>', 'Url')
         .parse(process.argv);
         
-    console.log(program.url);
+    //console.log(program.url);
     if(typeof program.url != "undefined")
     {	
-    	console.log(2);
+    	//console.log(2);
     	rest.get(program.url).on('complete', completeDownload);
-    	console.log(3);
+    	//console.log(3);
     }
     else
     {
     	var checkJson = checkHtmlFile(program.file, program.checks);
     	var outJson = JSON.stringify(checkJson, null, 4);
+    	console.log(outJson);
     }
-    console.log(outJson);
+    
 } else {
     exports.checkHtmlFile = checkHtmlFile;
 }
